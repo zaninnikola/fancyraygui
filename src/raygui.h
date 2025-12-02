@@ -334,7 +334,6 @@
 *     3. This notice may not be removed or altered from any source distribution.
 *
 **********************************************************************************************/
-
 #ifndef RAYGUI_H
 #define RAYGUI_H
 
@@ -1457,6 +1456,9 @@ static int GetCharPressed(void);         // -- GuiTextBox(), GuiValueBox()
 //-------------------------------------------------------------------------------
 static void DrawRectangle(int x, int y, int width, int height, Color color);        // -- GuiDrawRectangle()
 static void DrawRectangleGradientEx(Rectangle rec, Color col1, Color col2, Color col3, Color col4); // -- GuiColorPicker()
+static void DrawRectangleRoundedLinesEx(Rectangle rec, float roundness, int segments, float lineThick, Color color); // GuiDrawRectangleRounded()
+static void DrawRectangleRounded(Rectangle rec, float roundness, int segments, Color color); // GuiDrawRectangleRounded()
+
 //-------------------------------------------------------------------------------
 
 // Text required functions
@@ -1506,6 +1508,7 @@ static const char *GetTextIcon(const char *text, int *iconId);  // Get text icon
 
 static void GuiDrawText(const char *text, Rectangle textBounds, int alignment, Color tint);     // Gui draw text using default font
 static void GuiDrawRectangle(Rectangle rec, int borderWidth, Color borderColor, Color color);   // Gui draw rectangle using default raygui style
+static void GuiDrawRectangleRounded(Rectangle rec, int borderWidth, Color borderColor, Color color, float roundness, int segments);
 
 static const char **GuiTextSplit(const char *text, char delimiter, int *count, int *textRow);   // Split controls text into multiple strings
 static Vector3 ConvertHSVtoRGB(Vector3 hsv);                    // Convert color data from HSV to RGB
@@ -2017,6 +2020,40 @@ int GuiButton(Rectangle bounds, const char *text)
     // Draw control
     //--------------------------------------------------------------------
     GuiDrawRectangle(bounds, GuiGetStyle(BUTTON, BORDER_WIDTH), GetColor(GuiGetStyle(BUTTON, BORDER + (state*3))), GetColor(GuiGetStyle(BUTTON, BASE + (state*3))));
+    GuiDrawText(text, GetTextBounds(BUTTON, bounds), GuiGetStyle(BUTTON, TEXT_ALIGNMENT), GetColor(GuiGetStyle(BUTTON, TEXT + (state*3))));
+
+    if (state == STATE_FOCUSED) GuiTooltip(bounds);
+    //------------------------------------------------------------------
+
+    return result;      // Button pressed: result = 1
+}
+
+int GuiButton(Rectangle bounds, float roundness,  const char *text)
+{
+    int result = 0;
+    GuiState state = guiState;
+
+    // Update control
+    //--------------------------------------------------------------------
+    if ((state != STATE_DISABLED) && !guiLocked && !guiControlExclusiveMode)
+    {
+        Vector2 mousePoint = GetMousePosition();
+
+        // Check button state
+        if (CheckCollisionPointRec(mousePoint, bounds))
+        {
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) state = STATE_PRESSED;
+            else state = STATE_FOCUSED;
+
+            if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) result = 1;
+        }
+    }
+    //--------------------------------------------------------------------
+
+    // Draw control
+    //--------------------------------------------------------------------
+    int segments =(int) fmax(4, ((float)fmin(bounds.height, bounds.width))/20.0f*roundness);
+    GuiDrawRectangleRounded(bounds, GuiGetStyle(BUTTON, BORDER_WIDTH), GetColor(GuiGetStyle(BUTTON, BORDER + (state*3))), GetColor(GuiGetStyle(BUTTON, BASE + (state*3))), roundness, segments);
     GuiDrawText(text, GetTextBounds(BUTTON, bounds), GuiGetStyle(BUTTON, TEXT_ALIGNMENT), GetColor(GuiGetStyle(BUTTON, TEXT + (state*3))));
 
     if (state == STATE_FOCUSED) GuiTooltip(bounds);
@@ -5358,6 +5395,25 @@ static void GuiDrawRectangle(Rectangle rec, int borderWidth, Color borderColor, 
         DrawRectangle((int)rec.x, (int)rec.y + borderWidth, borderWidth, (int)rec.height - 2*borderWidth, GuiFade(borderColor, guiAlpha));
         DrawRectangle((int)rec.x + (int)rec.width - borderWidth, (int)rec.y + borderWidth, borderWidth, (int)rec.height - 2*borderWidth, GuiFade(borderColor, guiAlpha));
         DrawRectangle((int)rec.x, (int)rec.y + (int)rec.height - borderWidth, (int)rec.width, borderWidth, GuiFade(borderColor, guiAlpha));
+    }
+
+#if defined(RAYGUI_DEBUG_RECS_BOUNDS)
+    DrawRectangle((int)rec.x, (int)rec.y, (int)rec.width, (int)rec.height, Fade(RED, 0.4f));
+#endif
+}
+
+static void GuiDrawRectangleRounded(Rectangle rec, int borderWidth, Color borderColor, Color color, float roundness, int segments)
+{
+    if (color.a > 0)
+    {
+        // Draw rectangle filled with color
+        DrawRectangleRounded(rec, roundness, segments, GuiFade(color, guiAlpha));
+    }
+
+    if (borderWidth > 0)
+    {
+        // Draw rectangle border lines with color
+        DrawRectangleRoundedLinesEx(rec, roundness, segments, borderWidth, GuiFade(borderColor, guiAlpha));
     }
 
 #if defined(RAYGUI_DEBUG_RECS_BOUNDS)

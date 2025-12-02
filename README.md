@@ -1,6 +1,6 @@
 <img align="left" src="logo/raygui_256x256.png" width=256>
 
-**raygui is a simple and easy-to-use immediate-mode-gui library.**
+**fancyraygui is just raygui, but with rounded buttons.**
 
 `raygui` was originally inspired by [Unity IMGUI](https://docs.unity3d.com/Manual/GUIScriptingGuide.html) (immediate mode GUI API).
 
