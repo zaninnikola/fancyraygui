@@ -24,6 +24,7 @@
  - Standalone usage mode supported (for other graphic libs)
  - **Icons support**, embedding a complete 1-bit icons pack
  - Multiple **tools** provided for raygui development
+ - **Rounded buttons**
 
 ## code sample
 ```c
@@ -46,7 +47,7 @@ int main()
         BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
-            if (GuiButton((Rectangle){ 24, 24, 120, 30 }, "#191#Show Message")) showMessageBox = true;
+            if (GuiButton((Rectangle){ 24, 24, 120, 30 }, 1.0f, "#191#Show Message")) showMessageBox = true;
 
             if (showMessageBox)
             {
