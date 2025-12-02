@@ -160,4 +160,6 @@ gcc -o raygui.dynlib src/raygui.c -shared -fpic -DRAYGUI_IMPLEMENTATION -framewo
 
 ## license
 
-raygui is licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
+Original raygui is licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. 
+Fancy things is licensed under zlib NON-AI license from [this repo](https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-ZLIB).
+Check [LICENSE](LICENSE) for further details.
