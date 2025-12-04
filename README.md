@@ -37,6 +37,7 @@ int main()
 {
     InitWindow(400, 200, "raygui - controls test suite");
     SetTargetFPS(60);
+    GuiSetStyle(BUTTON, BORDER_RADIUS, 1000); //100% roundness
 
     bool showMessageBox = false;
 

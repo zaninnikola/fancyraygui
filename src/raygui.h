@@ -574,9 +574,10 @@ typedef enum {
     BACKGROUND_COLOR,           // Background color
     TEXT_LINE_SPACING,          // Text spacing between lines
     TEXT_ALIGNMENT_VERTICAL,    // Text vertical alignment inside text bounds (after border and padding)
-    TEXT_WRAP_MODE              // Text wrap-mode inside text bounds
+    TEXT_WRAP_MODE,              // Text wrap-mode inside text bounds
     //TEXT_DECORATION             // Text decoration: 0-None, 1-Underline, 2-Line-through, 3-Overline
     //TEXT_DECORATION_THICK       // Text decoration line thickness
+    BORDER_RADIUS = 23
 } GuiDefaultProperty;
 
 // Other possible text properties:
@@ -2019,42 +2020,13 @@ int GuiButton(Rectangle bounds, const char *text)
 
     // Draw control
     //--------------------------------------------------------------------
-    GuiDrawRectangle(bounds, GuiGetStyle(BUTTON, BORDER_WIDTH), GetColor(GuiGetStyle(BUTTON, BORDER + (state*3))), GetColor(GuiGetStyle(BUTTON, BASE + (state*3))));
-    GuiDrawText(text, GetTextBounds(BUTTON, bounds), GuiGetStyle(BUTTON, TEXT_ALIGNMENT), GetColor(GuiGetStyle(BUTTON, TEXT + (state*3))));
-
-    if (state == STATE_FOCUSED) GuiTooltip(bounds);
-    //------------------------------------------------------------------
-
-    return result;      // Button pressed: result = 1
-}
-
-int GuiButton(Rectangle bounds, float roundness,  const char *text)
-{
-    int result = 0;
-    GuiState state = guiState;
-
-    // Update control
-    //--------------------------------------------------------------------
-    if ((state != STATE_DISABLED) && !guiLocked && !guiControlExclusiveMode)
-    {
-        Vector2 mousePoint = GetMousePosition();
-
-        // Check button state
-        if (CheckCollisionPointRec(mousePoint, bounds))
-        {
-            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) state = STATE_PRESSED;
-            else state = STATE_FOCUSED;
-
-            if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) result = 1;
-        }
-    }
-    //--------------------------------------------------------------------
-
-    // Draw control
-    //--------------------------------------------------------------------
-    int segments =(int) fmax(4, ((float)fmin(bounds.height, bounds.width))/20.0f*roundness);
-    GuiDrawRectangleRounded(bounds, GuiGetStyle(BUTTON, BORDER_WIDTH), GetColor(GuiGetStyle(BUTTON, BORDER + (state*3))), GetColor(GuiGetStyle(BUTTON, BASE + (state*3))), roundness, segments);
-    GuiDrawText(text, GetTextBounds(BUTTON, bounds), GuiGetStyle(BUTTON, TEXT_ALIGNMENT), GetColor(GuiGetStyle(BUTTON, TEXT + (state*3))));
+    if(GuiGetStyle(BUTTON, BORDER_RADIUS) == 0) GuiDrawRectangle(bounds, GuiGetStyle(BUTTON, BORDER_WIDTH), GetColor(GuiGetStyle(BUTTON, BORDER + (state*3))), GetColor(GuiGetStyle(BUTTON, BASE + (state*3))));
+	else{
+		float roundness = ((float)GuiGetStyle(BUTTON, BORDER_RADIUS))/1000.0f;
+		int segments =(int) fmax(4, ((float)fmin(bounds.height, bounds.width))/20.0f*roundness);
+	    GuiDrawRectangleRounded(bounds, GuiGetStyle(BUTTON, BORDER_WIDTH), GetColor(GuiGetStyle(BUTTON, BORDER + (state*3))), GetColor(GuiGetStyle(BUTTON, BASE + (state*3))), roundness, segments); 
+	}
+	GuiDrawText(text, GetTextBounds(BUTTON, bounds), GuiGetStyle(BUTTON, TEXT_ALIGNMENT), GetColor(GuiGetStyle(BUTTON, TEXT + (state*3))));
 
     if (state == STATE_FOCUSED) GuiTooltip(bounds);
     //------------------------------------------------------------------
